@@ -1,0 +1,113 @@
+package selenium.practice;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
+
+public class TestCase01_Myntra {
+
+	public static void main(String[] args) throws InterruptedException {
+		
+		System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
+		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--disable-notifications");
+		ChromeDriver driver = new ChromeDriver(options);
+		driver.get("https://www.myntra.com/");
+		driver.manage().window().maximize();
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		
+		//2)Mouse Over on WOMEN & 3)Click Jackets & Coats
+		WebElement women = driver.findElementByXPath("//a[text()='Women']");
+		WebElement jackets = driver.findElementByXPath("//a[text()='Jackets & Coats']");
+		Actions builder = new Actions(driver);
+		builder.moveToElement(women).pause(1000).click(jackets).perform();
+		
+		//4) Find the total count of item
+		String str = driver.findElementByXPath("//span[@class='title-count']").getText();
+		String text = str.replaceAll("\\D", "");
+		int titleCount = Integer.parseInt(text);
+		System.out.println("Total count of item is : "+titleCount);
+		
+		//5)Validate the sum of categories count matches
+		String str1 = driver.findElementByXPath("//label[text()='Jackets']/span").getText();
+		String str2 = driver.findElementByXPath("//label[text()='Coats']/span").getText();
+		String category1 = str1.replaceAll("\\D", "");
+		String category2 = str2.replaceAll("\\D", "");
+		int countOfCategory1 = Integer.parseInt(category1);
+		int countOfCategory2 = Integer.parseInt(category2);
+		int sum = countOfCategory1 + countOfCategory2;
+		System.out.println("Sum of categories: "+sum);
+		if(sum == titleCount)
+		{
+			System.out.println("Sum of the categories count matches with the title count");
+		}
+		else
+		{
+			System.out.println("Count doesn't match");
+		}
+		
+		//6)Check coats
+		driver.findElementByXPath("//label[text()='Coats']/div").click();
+		
+		//7)Click +More option under Brand
+		driver.findElementByXPath("//div[@class='brand-more']").click();
+		
+		//8)Type MANGO and click check box
+		driver.findElementByXPath("//input[@class='FilterDirectory-searchInput']").sendKeys("MANGO");
+		driver.findElementByXPath("//label[@class=' common-customCheckbox']/div").click();
+		
+		//9)Close the pop-up
+		driver.findElementByXPath("//span[@class='myntraweb-sprite FilterDirectory-close sprites-remove']").click();
+		Thread.sleep(3000);
+		
+		//10)Confirm all the coats are of brand MANGO
+		List<WebElement> brands = driver.findElementsByXPath("//h3[@class='product-brand']");
+		int count = 0;
+		for(WebElement eachBrand : brands)
+		{
+			String brandName = eachBrand.getText();
+			//System.out.println("Each brand name: "+brandName);
+			if(brandName.equalsIgnoreCase("MANGO"))
+			{
+				count++;
+			}
+		}
+		if(count == brands.size())
+		{
+			System.out.println("All the coats are of brand MANGO");
+		}
+		else 
+		{
+			System.out.println("Brand is not matched");
+		}
+		
+		//11)Sort by Better Discount
+		WebElement sort = driver.findElementByXPath("//div[@class='sort-sortBy']");
+		WebElement betterDiscount = driver.findElementByXPath("(//label[@class='sort-label '])[3]");
+		builder.moveToElement(sort).perform();
+		builder.click(betterDiscount).perform();
+
+		
+		//12)Find the price of first displayed item
+		String discountedPrice = driver.findElementByXPath("(//span[@class='product-discountedPrice'])[1]").getText();
+		String price = discountedPrice.replaceAll("\\D", "");
+		int firstDisplayedPrice = Integer.parseInt(price);
+		System.out.println("Price of first displayed item: "+firstDisplayedPrice);
+		
+		//13)Mouse Over on size of the first item & 14)Click on WishListNow
+		WebElement mouseOverSize = driver.findElementByXPath("(//h4[@class='product-product'])[1]");
+		WebElement clickOnWishlist = driver.findElementByXPath("(//span[text()='wishlist now'])[1]");
+		driver.executeScript("window.scrollBy(0,400)");
+		builder.moveToElement(mouseOverSize).perform();
+		builder.click(clickOnWishlist).perform();
+		
+		//14)Close Browser
+		driver.close();
+		
+	}
+
+}
