@@ -1,0 +1,123 @@
+package selenium.project.day;
+
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+
+public class Test02_Azure {
+
+	public static void main(String[] args) throws InterruptedException {
+		
+			System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
+			ChromeDriver driver = new ChromeDriver();
+			driver.get("https://azure.microsoft.com/en-in/");
+			driver.manage().window().maximize();
+			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			
+			//2) Click on Pricing
+			driver.findElementById("navigation-pricing").click();
+			
+			//3) Click on Pricing Calculator
+			driver.findElementByXPath("//a[contains(text(),'Pricing calculator')]").click();
+			
+			//4) Click on Containers
+			driver.findElementByXPath("//button[text() = 'Containers']").click();
+			
+			//5) Select Container Instances
+			driver.findElementByXPath("(//span[text() = 'Container Instances'])[3]").click();
+			
+			//6) Click on Container Instance Added View
+			driver.findElementById("new-module-loc").click();
+			
+			//7) Select Region as "South India"
+			Select dropDown = new Select(driver.findElementByName("region"));
+			dropDown.selectByValue("south-india");
+			
+			//8) Set the Duration as 180000 seconds
+			//driver.findElementByName("seconds").sendKeys(Keys.HOME,Keys.chord(Keys.SHIFT,Keys.END));
+			driver.findElementByName("seconds").sendKeys(Keys.HOME,Keys.DELETE,Keys.DELETE);
+			driver.findElementByName("seconds").sendKeys("180000",Keys.TAB);
+			
+			//9) Select the Memory as 4GB
+			Select dropDown1 = new Select(driver.findElementByName("memory"));
+			dropDown1.selectByValue("4");
+			
+			//10) Enable SHOW DEV/TEST PRICING
+			driver.findElementById("devtest-toggler").click();
+			
+			//11) Select Indian Rupee  as currency
+			Select dropDown2 = new Select(driver.findElementByXPath("//select[@class = 'select currency-dropdown']"));
+			dropDown2.selectByValue("INR");
+			
+			//12) Print the Estimated monthly price
+			String str = driver.findElementByXPath("//h3[text() = 'Estimated monthly cost']/following::span[@class = 'numeric'][2]").getText();
+			String price = str.replaceAll("\\D", "");
+			int monthlyPrice = Integer.parseInt(price);
+			System.out.println("Estimated monthly cost: "+monthlyPrice);
+			
+			//13) Click on Export to download the estimate as excel
+			driver.findElementByXPath("//button[text() = 'Export']").click();
+			Thread.sleep(5000);
+			
+			//14) Verify the downloded file in the local folder
+			File dir = new File("C:/Users/Marimuthu/Downloads");
+			File[] dirContents = dir.listFiles();
+			for(int i=0; i<dirContents.length; i++)
+			{
+				if(dirContents[i].getName().equals("ExportedEstimate.xlsx"))
+				{
+					System.out.println("File is successfully downloaded");
+					break;
+				}
+			}
+			
+			//15) Navigate to Example Scenarios and Select CI/CD for Containers
+			Actions builder = new Actions(driver);
+			builder.sendKeys(Keys.PAGE_UP).build().perform();
+			WebElement ele = driver.findElementByXPath("//a[text() = 'Example Scenarios']");
+			builder.click(ele).perform();
+			driver.findElementByXPath("//span[text() = 'CI/CD for Containers']").click();
+	
+			
+			//16) Click Add to Estimate
+			WebElement ele1 = driver.findElementByXPath("//button[text() = 'Add to estimate']");
+			driver.executeScript("arguments[0].click();", ele1);
+			
+			//17) Change the Currency as Indian Rupee
+			WebElement currency = driver.findElementByXPath("//select[@class = 'select currency-dropdown']");
+			builder.moveToElement(currency).perform();
+			Select dropDown3 = new Select(currency);
+			dropDown3.selectByValue("INR");
+			
+			//18) Enable SHOW DEV/TEST PRICING
+			WebElement ele2 = driver.findElementByXPath("(//div[@class = 'toggler-slide '])[1]");
+			driver.executeScript("arguments[0].click();", ele2);
+			
+			//19) Export the Estimate
+			driver.findElementByXPath("//button[text() = 'Export']").click();
+			Thread.sleep(5000);
+			
+			//20) Verify the downloded file in the local folder
+			File dir1 = new File("C:/Users/Marimuthu/Downloads");
+			File[] dirContents1 = dir1.listFiles();
+			for(int i=0; i<dirContents1.length; i++)
+			{
+				if(dirContents1[i].getName().equals("ExportedEstimate (1).xlsx"))
+				{
+					System.out.println("File is successfully downloaded");
+					break;
+				}
+			}
+
+	}
+
+}
