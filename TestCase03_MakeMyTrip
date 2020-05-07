@@ -1,0 +1,84 @@
+package selenium.practice;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class TestCase03_MakeMyTrip {
+
+	public static void main(String[] args) throws InterruptedException {
+		
+		System.setProperty("webdriver.chrome.driver", "./drivers/chromedriver.exe");
+		ChromeDriver driver = new ChromeDriver();
+		driver.get("https://www.makemytrip.com/");
+		driver.manage().window().maximize();
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		
+		//2)Click Hotels
+		driver.findElementByXPath("//span[text()='Hotels']").click();
+		
+		//3)Enter city as Goa and choose Goa, India
+		driver.findElementByXPath("//div[@class='hsw_inputBox selectHtlCity  ']").click();
+		//driver.findElementByXPath("//input[@class='react-autosuggest__input react-autosuggest__input--open']").sendKeys("Goa");
+		driver.findElementByXPath("//input[@placeholder='Enter city/ Hotel/ Area/ Building']").sendKeys("Goa");
+		driver.findElementByXPath("//p[text()='Goa, India']").click();
+		
+		//4)Enter Check in date as Next month 15th (May 15) and Check out as start date+5
+		WebElement checkIn = driver.findElementByXPath("//div[@class='DayPicker-Caption']/div[text()='May']/following::div[text()='15']");
+		checkIn.click();
+		String date = checkIn.getText();
+		int checkInDate = Integer.parseInt(date);
+		int checkOutDate = checkInDate + 5;
+		driver.findElementByXPath("//div[@class='DayPicker-Caption']/div[text()='May']/following::div[text()='"+checkOutDate+"']").click();
+		
+		//5)Click on ROOMS & GUESTS and click 2 Adults and one Children(age 12) & Click Apply Button
+		driver.findElementById("guest").click();
+		driver.findElementByXPath("(//li[text()='2'])[1]").click();
+		driver.findElementByXPath("(//li[text()='1'])[2]").click();
+		driver.findElementByXPath("//button[text()='APPLY']").click();
+		
+		//6)Click Search button
+		driver.findElementById("hsw_search_button").click();
+		
+		//7)Select locality as Baga
+		driver.findElementByXPath("//body[@class='bodyFixed overlayWholeBlack']").click();
+		driver.findElementByXPath("//label[text()='Baga']").click();
+		
+		//8)Select 5 start in Star Category under Select Filters
+		WebElement ele = driver.findElementByXPath("//label[text()='5 Star']");
+		WebDriverWait wait = new WebDriverWait(driver,30);
+		driver.executeScript("window.scrollBy(0,600)");
+		wait.until(ExpectedConditions.elementToBeClickable(ele));
+		ele.click();
+		
+		//9)Click on the first resulting hotel and go to the new window
+		driver.findElementByXPath("//div[@id='Listing_hotel_0'][1]").click();
+		Set<String> allWindows = driver.getWindowHandles();
+		List<String> ls = new ArrayList<String>(allWindows);
+		driver.switchTo().window(ls.get(1));
+		
+		//10)Print the Hotel Name 
+		String hotelName = driver.findElementById("detpg_hotel_name").getText();
+		System.out.println("Hotel Name: "+hotelName);
+		
+		//11)Click MORE OPTIONS link and Select 3Months plan and close
+		driver.findElementByXPath("//span[text()='MORE OPTIONS']").click();
+		driver.findElementByXPath("//td[contains(text(),'3')]/following-sibling::td/span").click();
+		driver.findElementByXPath("//span[@class='close']").click();
+		
+		//12)Click on BOOK THIS NOW
+		//driver.findElementByXPath("//a[text()='BOOK THIS NOW']").click();
+		
+		//13)Print the Total Payable amount
+		//String amount = driver.findElementById("revpg_total_payable_amt").getText();
+		//System.out.println("Total Payable amount: "+amount);
+		//14)Close the browser
+	}
+
+}
